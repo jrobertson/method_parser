@@ -11,7 +11,9 @@ class MethodParser
   attr_reader :to_a  
 
   def initialize(s)
-    @to_a = nestify(flatten_down(scan Parser::CurrentRuby.parse(s)))
+    a = scan Parser::CurrentRuby.parse(s)
+    a2 = flatten_down(a)
+    @to_a = nestify(a2)
   end
   
   def to_xml
@@ -23,8 +25,8 @@ class MethodParser
         container, name, children = x
         xml.send(container.to_s.sub(/^c/,'k').to_sym, name: name.to_s) do
           children.each do |y|
-            _, name, scope = y.map(&:to_s)
-            xml.send(y.first, name: name, scope: scope)
+            _, name, scope, args = y[0..2].map(&:to_s) << y[-1]
+            xml.send(y.first, name: name, scope: scope, args: args.join(', '))
           end
         end
       end
@@ -52,7 +54,7 @@ class MethodParser
     a2 = case x.type
 
       when :def
-        [x.type, x.to_a.first]
+        [x.type, x.to_a.first, x.children[1].children.map{|x| x.children[0]}]
       when :class
         [x.type, x.to_a.first.to_a[1]]
 
@@ -98,9 +100,9 @@ class MethodParser
             case mx.first
             when :def
 
-              method = mx.last                    
+              method = mx[1]                    
               r.last.last << 
-                [:def, method, method == :initialize ? :private : scope]
+                [:def, method, method == :initialize ? :private : scope, mx[2]]
             when :private
               scope = :private
             when :protected

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'method_parser'
-  s.version = '0.1.5'
+  s.version = '0.1.6'
   s.summary = 'Uses the Parser gem to primarily return the defined methods for the class'
   s.authors = ['James Robertson']
   s.files = Dir['lib/**/*.rb']

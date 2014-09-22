@@ -17,21 +17,17 @@ class MethodParser
   def to_xml
     
     xml = RexleBuilder.new
+    
     a = xml.doc do
-        @to_a.each do |x|
-          container, name, children = x
-          puts 'container : ' +  container.inspect
-          puts 'children : ' + children.inspect
-          xml.send(container.to_s.sub(/^c/,'k').to_sym, name: name.to_s) do
-            children.each do |y|
-              _, name, scope = y.map(&:to_s)
-              puts 'd'
-              p y
-              xml.send(y.first, name: name, scope: scope)
-            end
+      @to_a.each do |x|
+        container, name, children = x
+        xml.send(container.to_s.sub(/^c/,'k').to_sym, name: name.to_s) do
+          children.each do |y|
+            _, name, scope = y.map(&:to_s)
+            xml.send(y.first, name: name, scope: scope)
           end
         end
-
+      end
     end
     
     Rexle.new(a).xml pretty: true
